@@ -1,65 +1,318 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>نمایش درجا</title>
-    <style>
-        .report-card { border: 2px solid #444; padding: 20px; margin-top: 20px; border-radius: 10px; max-width: 600px; }
-        .media-preview { max-width: 100%; margin-top: 10px; border-radius: 5px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amir Panel — مدیریت رسانه</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1020;
+    --card:rgba(255,255,255,.06);
+    --stroke:rgba(255,255,255,.12);
+    --txt:#e9eefc;
+    --muted:#9aa6c4;
+    --accent:#6c8cff;
+    --accent2:#22d3ee;
+    --danger:#ff5c7a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; font-family:'Vazirmatn',Tahoma,sans-serif;
+    color:var(--txt); background:var(--bg);
+    background-image:
+      radial-gradient(900px 500px at 85% -10%, rgba(108,140,255,.35), transparent 60%),
+      radial-gradient(700px 500px at 10% 0%, rgba(34,211,238,.22), transparent 60%),
+      radial-gradient(800px 600px at 50% 120%, rgba(160,90,255,.20), transparent 60%);
+  }
+  .wrap{max-width:980px; margin:auto; padding:28px 18px 60px}
+
+  /* ===== هدر ===== */
+  header.brand{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:16px 20px; border-radius:20px;
+    background:linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+    border:1px solid var(--stroke);
+    backdrop-filter:blur(14px);
+    box-shadow:0 18px 50px rgba(0,0,0,.35);
+    flex-wrap:wrap;
+  }
+  .brand-left{display:flex; align-items:center; gap:14px}
+  .logo{
+    width:52px; height:52px; border-radius:16px; display:grid; place-items:center;
+    font-weight:800; font-size:20px; color:#08122b;
+    background:linear-gradient(135deg,var(--accent2),var(--accent));
+    box-shadow:0 8px 24px rgba(108,140,255,.45);
+  }
+  .brand-title{font-size:19px; font-weight:800; letter-spacing:.2px}
+  .brand-sub{font-size:12.5px; color:var(--muted); margin-top:2px}
+  .names{display:flex; gap:10px; flex-wrap:wrap}
+  .chip{
+    padding:9px 16px; border-radius:999px; font-size:13.5px; font-weight:600;
+    border:1px solid var(--stroke);
+    background:linear-gradient(135deg, rgba(108,140,255,.22), rgba(34,211,238,.12));
+    color:#dfe7ff; white-space:nowrap;
+  }
+  .chip span{color:var(--accent2)}
+
+  /* ===== کارت فرم ===== */
+  .card{
+    margin-top:22px; padding:22px; border-radius:20px;
+    background:var(--card); border:1px solid var(--stroke);
+    backdrop-filter:blur(12px);
+    box-shadow:0 14px 40px rgba(0,0,0,.28);
+  }
+  .card h2{margin:0 0 14px; font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent2); box-shadow:0 0 12px var(--accent2)}
+
+  textarea, input[type=text]{
+    width:100%; padding:13px 14px; border-radius:14px; resize:vertical;
+    background:rgba(0,0,0,.28); color:var(--txt);
+    border:1px solid var(--stroke); font-family:inherit; font-size:14px;
+    outline:none; transition:.2s;
+  }
+  textarea:focus, input[type=text]:focus{border-color:var(--accent); box-shadow:0 0 0 4px rgba(108,140,255,.16)}
+  textarea{min-height:96px}
+
+  .drop{
+    margin-top:14px; padding:22px; border-radius:16px; text-align:center;
+    border:1.5px dashed rgba(255,255,255,.22); cursor:pointer; transition:.2s;
+    background:rgba(255,255,255,.02);
+  }
+  .drop:hover{border-color:var(--accent); background:rgba(108,140,255,.08)}
+  .drop small{display:block; color:var(--muted); margin-top:6px; font-size:12px}
+  .drop strong{font-size:14px}
+  input[type=file]{display:none}
+
+  .row{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap}
+  button{
+    font-family:inherit; font-size:14px; font-weight:700; cursor:pointer;
+    padding:12px 22px; border-radius:14px; border:1px solid transparent; transition:.18s;
+  }
+  .btn-main{color:#08122b; background:linear-gradient(135deg,var(--accent2),var(--accent)); box-shadow:0 10px 26px rgba(108,140,255,.35)}
+  .btn-main:hover{transform:translateY(-1px)}
+  .btn-ghost{background:transparent; color:var(--txt); border-color:var(--stroke)}
+  .btn-ghost:hover{border-color:var(--accent)}
+  .btn-danger{background:rgba(255,92,122,.14); color:#ffb3c1; border-color:rgba(255,92,122,.4)}
+  .btn-danger:hover{background:rgba(255,92,122,.24)}
+
+  /* ===== گالری ===== */
+  .gallery-head{display:flex; align-items:center; justify-content:space-between; margin:30px 4px 12px; flex-wrap:wrap; gap:10px}
+  .gallery-head h3{margin:0; font-size:16px}
+  .count{font-size:12.5px; color:var(--muted)}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px}
+  .item{
+    border-radius:18px; overflow:hidden; background:var(--card);
+    border:1px solid var(--stroke); display:flex; flex-direction:column;
+    animation:pop .28s ease;
+  }
+  @keyframes pop{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .media{aspect-ratio:16/10; background:#05080f; display:grid; place-items:center; overflow:hidden}
+  .media img, .media video{width:100%; height:100%; object-fit:cover; display:block}
+  .body{padding:12px 14px 14px}
+  .body p{margin:0 0 8px; font-size:13.5px; line-height:1.9; word-break:break-word}
+  .meta{font-size:11.5px; color:var(--muted); display:flex; justify-content:space-between; gap:8px; margin-bottom:10px}
+  .empty{text-align:center; color:var(--muted); padding:40px 0; font-size:14px}
+  .toast{
+    position:fixed; inset-inline:0; bottom:22px; margin:auto; width:max-content; max-width:90%;
+    padding:11px 20px; border-radius:14px; font-size:13.5px; font-weight:600;
+    background:rgba(20,28,50,.95); border:1px solid var(--stroke); color:var(--txt);
+    opacity:0; transform:translateY(12px); transition:.25s; pointer-events:none; z-index:99;
+  }
+  .toast.show{opacity:1; transform:none}
+</style>
 </head>
 <body>
+<div class="wrap">
 
-<div style="max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc;">
-    <h3>فرم گزارش</h3>
-    <textarea id="note" placeholder="متن یادداشت..." style="width: 100%; height: 80px;"></textarea><br><br>
-    <input type="file" id="filePicker" accept="image/*,video/*"><br><br>
-    <button onclick="displayReport()">نمایش در صفحه</button>
+  <!-- ===== هدر با نام‌ها ===== -->
+  <header class="brand">
+    <div class="brand-left">
+      <div class="logo">AT</div>
+      <div>
+        <div class="brand-title">Amir Panel</div>
+        <div class="brand-sub">مدیریت و آرشیو رسانه — نسخه حرفه‌ای</div>
+      </div>
+    </div>
+    <div class="names">
+      <div class="chip">amir <span>tork</span></div>
+      <div class="chip">amir <span>payambar</span></div>
+    </div>
+  </header>
+
+  <!-- ===== فرم ===== -->
+  <section class="card">
+    <h2><span class="dot"></span> افزودن محتوای جدید</h2>
+
+    <input type="text" id="title" placeholder="عنوان (اختیاری)">
+    <textarea id="note" placeholder="متن یادداشت یا توضیح خود را اینجا بنویسید..." style="margin-top:12px"></textarea>
+
+    <label class="drop" for="filePicker" id="dropZone">
+      <strong>📁 انتخاب یا کشیدن فایل (عکس / ویدیو)</strong>
+      <small id="fileName">هیچ فایلی انتخاب نشده است</small>
+    </label>
+    <input type="file" id="filePicker" accept="image/*,video/*">
+
+    <div class="row">
+      <button class="btn-main" onclick="addItem()">افزودن به آرشیو</button>
+      <button class="btn-ghost" onclick="resetForm()">پاک کردن فرم</button>
+    </div>
+  </section>
+
+  <!-- ===== گالری ===== -->
+  <div class="gallery-head">
+    <h3>🗂 آرشیو محتوا</h3>
+    <div class="count" id="count">۰ مورد</div>
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <div class="row" style="margin-top:26px">
+    <button class="btn-danger" onclick="clearAll()">حذف کل آرشیو</button>
+  </div>
 </div>
 
-<!-- ناحیه‌ای که گزارش در آن ظاهر می‌شود -->
-<div id="outputArea" style="max-width: 600px; margin: auto;"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-    function displayReport() {
-        const text = document.getElementById('note').value;
-        const fileInput = document.getElementById('filePicker');
-        const outputArea = document.getElementById('outputArea');
-        
-        if (fileInput.files.length === 0) {
-            alert("لطفاً یک فایل انتخاب کنید.");
-            return;
-        }
+const KEY = 'amir_panel_items_v1';
+let items = JSON.parse(localStorage.getItem(KEY) || '[]');
+let pendingFile = null;
 
-        const file = fileInput.files[0];
-        const reader = new FileReader();
+/* --- انتخاب فایل --- */
+const picker = document.getElementById('filePicker');
+picker.addEventListener('change', () => {
+  const f = picker.files[0];
+  if (!f) return;
+  pendingFile = f;
+  document.getElementById('fileName').textContent = f.name + ' — ' + (f.size/1048576).toFixed(2) + ' MB';
+});
 
-        reader.onload = function(e) {
-            const fileData = e.target.result;
-            let mediaTag = "";
+/* --- کشیدن و رها کردن --- */
+const dz = document.getElementById('dropZone');
+['dragover','dragenter'].forEach(ev => dz.addEventListener(ev, e => {e.preventDefault(); dz.style.borderColor='#6c8cff';}));
+['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => {e.preventDefault(); dz.style.borderColor='';}));
+dz.addEventListener('drop', e => {
+  const f = e.dataTransfer.files[0];
+  if (!f) return;
+  pendingFile = f;
+  document.getElementById('fileName').textContent = f.name + ' — ' + (f.size/1048576).toFixed(2) + ' MB';
+});
 
-            if (file.type.startsWith('image/')) {
-                mediaTag = `<img src="${fileData}" class="media-preview">`;
-            } else if (file.type.startsWith('video/')) {
-                mediaTag = `<video controls class="media-preview"><source src="${fileData}" type="${file.type}"></video>`;
-            }
+/* --- افزودن --- */
+function addItem(){
+  const text = document.getElementById('note').value.trim();
+  const title = document.getElementById('title').value.trim();
 
-            // اضافه کردن به صفحه بدون نیاز به دانلود
-            const reportDiv = document.createElement('div');
-            reportDiv.className = 'report-card';
-            reportDiv.innerHTML = `
-                <h4>گزارش جدید:</h4>
-                <p>${text}</p>
-                ${mediaTag}
-            `;
-            
-            // نمایش در بالای لیست خروجی‌ها
-            outputArea.prepend(reportDiv);
-        };
+  if (!text && !pendingFile){ toast('متنی بنویسید یا فایلی انتخاب کنید'); return; }
 
-        reader.readAsDataURL(file);
+  const save = (dataUrl, type) => {
+    items.unshift({
+      id: Date.now(),
+      title, text,
+      src: dataUrl || null,
+      type: type || null,
+      date: new Date().toISOString()
+    });
+    try{
+      localStorage.setItem(KEY, JSON.stringify(items));
+    }catch(err){
+      toast('حجم ذخیره‌سازی مرورگر پر شد؛ فایل کوچک‌تری انتخاب کنید');
+      items.shift();
+      return;
     }
-</script>
+    resetForm();
+    render();
+    toast('با موفقیت به آرشیو اضافه شد ✅');
+  };
 
+  if (pendingFile){
+    const r = new FileReader();
+    r.onload = e => save(e.target.result, pendingFile.type);
+    r.readAsDataURL(pendingFile);
+  } else {
+    save(null, null);
+  }
+}
+
+function resetForm(){
+  document.getElementById('note').value = '';
+  document.getElementById('title').value = '';
+  document.getElementById('filePicker').value = '';
+  document.getElementById('fileName').textContent = 'هیچ فایلی انتخاب نشده است';
+  pendingFile = null;
+}
+
+/* --- نمایش --- */
+function render(){
+  const grid = document.getElementById('grid');
+  const count = document.getElementById('count');
+  grid.innerHTML = '';
+
+  const fa = n => n.toLocaleString('fa-IR');
+  count.textContent = fa(items.length) + ' مورد';
+
+  if (!items.length){
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1">هنوز محتوایی اضافه نشده است.</div>';
+    return;
+  }
+
+  items.forEach(it => {
+    const el = document.createElement('div');
+    el.className = 'item';
+
+    let media = '';
+    if (it.src && it.type && it.type.startsWith('image/'))
+      media = `<img src="${it.src}" alt="">`;
+    else if (it.src && it.type && it.type.startsWith('video/'))
+      media = `<video controls preload="metadata"><source src="${it.src}" type="${it.type}"></video>`;
+    else
+      media = `<div style="color:#54608a;font-size:12px">بدون رسانه</div>`;
+
+    const d = new Date(it.date);
+    const dateStr = d.toLocaleDateString('fa-IR') + ' — ' + d.toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'});
+
+    el.innerHTML = `
+      <div class="media">${media}</div>
+      <div class="body">
+        ${it.title ? `<p style="font-weight:700">${escapeHtml(it.title)}</p>` : ''}
+        ${it.text ? `<p>${escapeHtml(it.text)}</p>` : ''}
+        <div class="meta"><span>${dateStr}</span></div>
+        <button class="btn-danger" style="width:100%;padding:9px" onclick="removeItem(${it.id})">حذف این مورد</button>
+      </div>`;
+    grid.appendChild(el);
+  });
+}
+
+function removeItem(id){
+  items = items.filter(x => x.id !== id);
+  localStorage.setItem(KEY, JSON.stringify(items));
+  render();
+  toast('مورد حذف شد 🗑');
+}
+
+function clearAll(){
+  if (!items.length) return;
+  if (confirm('همه محتوای آرشیو حذف شود؟ این عمل قابل بازگشت نیست.')){
+    items = [];
+    localStorage.removeItem(KEY);
+    render();
+    toast('کل آرشیو پاک شد');
+  }
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+let tId;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(tId);
+  tId = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+render();
+</script>
 </body>
 </html>
