@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نمایش درجا</title>
+    <style>
+        .report-card { border: 2px solid #444; padding: 20px; margin-top: 20px; border-radius: 10px; max-width: 600px; }
+        .media-preview { max-width: 100%; margin-top: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div style="max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc;">
+    <h3>فرم گزارش</h3>
+    <textarea id="note" placeholder="متن یادداشت..." style="width: 100%; height: 80px;"></textarea><br><br>
+    <input type="file" id="filePicker" accept="image/*,video/*"><br><br>
+    <button onclick="displayReport()">نمایش در صفحه</button>
+</div>
+
+<!-- ناحیه‌ای که گزارش در آن ظاهر می‌شود -->
+<div id="outputArea" style="max-width: 600px; margin: auto;"></div>
+
+<script>
+    function displayReport() {
+        const text = document.getElementById('note').value;
+        const fileInput = document.getElementById('filePicker');
+        const outputArea = document.getElementById('outputArea');
+        
+        if (fileInput.files.length === 0) {
+            alert("لطفاً یک فایل انتخاب کنید.");
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const fileData = e.target.result;
+            let mediaTag = "";
+
+            if (file.type.startsWith('image/')) {
+                mediaTag = `<img src="${fileData}" class="media-preview">`;
+            } else if (file.type.startsWith('video/')) {
+                mediaTag = `<video controls class="media-preview"><source src="${fileData}" type="${file.type}"></video>`;
+            }
+
+            // اضافه کردن به صفحه بدون نیاز به دانلود
+            const reportDiv = document.createElement('div');
+            reportDiv.className = 'report-card';
+            reportDiv.innerHTML = `
+                <h4>گزارش جدید:</h4>
+                <p>${text}</p>
+                ${mediaTag}
+            `;
+            
+            // نمایش در بالای لیست خروجی‌ها
+            outputArea.prepend(reportDiv);
+        };
+
+        reader.readAsDataURL(file);
+    }
+</script>
+
+</body>
+</html>
